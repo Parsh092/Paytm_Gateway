@@ -1,8 +1,6 @@
 package com.parsh.paytm_link;
 
 
-import androidx.databinding.library.baseAdapters.BuildConfig;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

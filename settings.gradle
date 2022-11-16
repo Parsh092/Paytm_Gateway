@@ -3,7 +3,6 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
-        maven {url "https://artifactory.paytm.in/libs-release-local"}
     }
 }
 dependencyResolutionManagement {
@@ -12,6 +11,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {url "https://artifactory.paytm.in/libs-release-local"}
+
     }
 }
 rootProject.name = "Paytm_Link"

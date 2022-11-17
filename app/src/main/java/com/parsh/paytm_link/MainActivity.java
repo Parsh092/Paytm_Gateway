@@ -34,10 +34,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-    private String  TAG ="MainActivity";
+    private String TAG = "MainActivity";
     private ProgressBar progressBar;
     private EditText txnAmount;
-    private String midString ="BcxPmp63647419741257", txnAmountString="", orderIdString="", txnTokenString="";
+    private String midString = "BcxPmp63647419741257", txnAmountString = "", orderIdString = "", txnTokenString = "";
     private Button btnPayNow;
     private Integer ActivityRequestCode = 2;
 
@@ -52,26 +52,25 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat df = new SimpleDateFormat("ddMMyyyy");
         String date = df.format(c.getTime());
         Random rand = new Random();
-        int min =1000, max= 9999;
+        int min = 1000, max = 9999;
 // nextInt as provided by Random is exclusive of the top value so you need to add 1
         int randomNum = rand.nextInt((max - min) + 1) + min;
-        orderIdString =  date+String.valueOf(randomNum);
+        orderIdString = date + String.valueOf(randomNum);
 
         btnPayNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 txnAmountString = txnAmount.getText().toString();
                 String errors = "";
-                if(orderIdString.equalsIgnoreCase("")){
-                    errors ="Enter valid Order ID here\n";
+                if (orderIdString.equalsIgnoreCase("")) {
+                    errors = "Enter valid Order ID here\n";
                     Toast.makeText(MainActivity.this, errors, Toast.LENGTH_SHORT).show();
 
-                }else
-                if(txnAmountString.equalsIgnoreCase("")){
-                    errors ="Enter valid Amount here\n";
+                } else if (txnAmountString.equalsIgnoreCase("")) {
+                    errors = "Enter valid Amount here\n";
                     Toast.makeText(MainActivity.this, errors, Toast.LENGTH_SHORT).show();
 
-                }else{
+                } else {
 
                     getToken();
                 }
@@ -80,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private  void getToken(){
+    private void getToken() {
         Log.e(TAG, " get token start");
         progressBar.setVisibility(View.VISIBLE);
         ServiceWrapper serviceWrapper = new ServiceWrapper(null);
@@ -88,51 +87,49 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<Token_Res>() {
             @Override
             public void onResponse(Call<Token_Res> call, Response<Token_Res> response) {
-                Log.e(TAG, " respo "+ response.isSuccessful() );
+                Log.e(TAG, " respo " + response.isSuccessful());
                 progressBar.setVisibility(View.GONE);
                 try {
 
-                    if (response.isSuccessful() && response.body()!=null){
-                        if (response.body().getBody().getTxnToken()!="") {
-                            Log.e(TAG, " transaction token : "+response.body().getBody().getTxnToken());
+                    if (response.isSuccessful() && response.body() != null) {
+                        if (response.body().getBody().getTxnToken() != "") {
+                            Log.e(TAG, " transaction token : " + response.body().getBody().getTxnToken());
                             startPaytmPayment(response.body().getBody().getTxnToken());
-                        }else {
+                        } else {
                             Log.e(TAG, " Token status false");
                         }
                     }
-                }catch (Exception e){
-                    Log.e(TAG, " error in Token Res "+e.toString());
+                } catch (Exception e) {
+                    Log.e(TAG, " error in Token Res " + e.toString());
                 }
             }
 
             @Override
             public void onFailure(Call<Token_Res> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                Log.e(TAG, " response error "+t.toString());
+                Log.e(TAG, " response error " + t.toString());
             }
         });
 
     }
 
 
-    public void startPaytmPayment (String token){
-
+    public void startPaytmPayment(String token) {
         txnTokenString = token;
         // for test mode use it
-         String host = "https://securegw-stage.paytm.in/";
+        String host = "https://securegw-stage.paytm.in/";
         // for production mode use it
-        // String host = "https://securegw-stage.paytm.in/";
+//        String host = "https://securegw.paytm.in/";
         String orderDetails = "MID: " + midString + ", OrderId: " + orderIdString + ", TxnToken: " + txnTokenString
                 + ", Amount: " + txnAmountString;
-        Log.e(TAG, "order details "+ orderDetails);
-
-        String callBackUrl = host + "theia/paytmCallback?ORDER_ID="+orderIdString;
-        Log.e(TAG, " callback URL "+callBackUrl);
+        //Log.e(TAG, "order details "+ orderDetails);
+        String callBackUrl = host + "theia/paytmCallback?ORDER_ID=" + orderIdString;
+        Log.e(TAG, " callback URL " + callBackUrl);
         PaytmOrder paytmOrder = new PaytmOrder(orderIdString, midString, txnTokenString, txnAmountString, callBackUrl);
-        TransactionManager transactionManager = new TransactionManager(paytmOrder, new PaytmPaymentTransactionCallback(){
+        TransactionManager transactionManager = new TransactionManager(paytmOrder, new PaytmPaymentTransactionCallback() {
             @Override
             public void onTransactionResponse(Bundle bundle) {
-                Log.e(TAG, "Response (onTransactionResponse) : "+bundle.toString());
+                Log.e(TAG, "Response (onTransactionResponse) : " + bundle.toString());
             }
 
             @Override
@@ -142,22 +139,22 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onErrorProceed(String s) {
-                Log.e(TAG, " onErrorProcess "+s.toString());
+                Log.e(TAG, " onErrorProcess " + s.toString());
             }
 
             @Override
             public void clientAuthenticationFailed(String s) {
-                Log.e(TAG, "Clientauth "+s);
+                Log.e(TAG, "Clientauth " + s);
             }
 
             @Override
             public void someUIErrorOccurred(String s) {
-                Log.e(TAG, " UI error "+s);
+                Log.e(TAG, " UI error " + s);
             }
 
             @Override
             public void onErrorLoadingWebPage(int i, String s, String s1) {
-                Log.e(TAG, " error loading web "+s+"--"+s1);
+                Log.e(TAG, " error loading web " + s + "--" + s1);
             }
 
             @Override
@@ -167,17 +164,16 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTransactionCancel(String s, Bundle bundle) {
-                Log.e(TAG, " transaction cancel "+s);
+                Log.e(TAG, " transaction cancel " + s);
             }
         });
-
         transactionManager.setShowPaymentUrl(host + "theia/api/v1/showPaymentPage");
         transactionManager.startTransaction(this, ActivityRequestCode);
-
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.e(TAG ," result code "+resultCode);
+        Log.e(TAG, " result code " + resultCode);
         // -1 means successful  // 0 means failed
         // one error is - nativeSdkForMerchantMessage : networkError
         super.onActivityResult(requestCode, resultCode, data);
@@ -188,8 +184,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, key + " : " + (bundle.get(key) != null ? bundle.get(key) : "NULL"));
                 }
             }
-            Log.e(TAG, " data "+  data.getStringExtra("nativeSdkForMerchantMessage"));
-            Log.e(TAG, " data response - "+data.getStringExtra("response"));
+            Log.e(TAG, " data " + data.getStringExtra("nativeSdkForMerchantMessage"));
+            Log.e(TAG, " data response - " + data.getStringExtra("response"));
 /*
  data response - {"BANKNAME":"WALLET","BANKTXNID":"1395841115",
  "CHECKSUMHASH":"7jRCFIk6eRmrep+IhnmQrlrL43KSCSXrmMP5pH0hekXaaxjt3MEgd1N9mLtWyu4VwpWexHOILCTAhybOo5EVDmAEV33rg2VAS/p0PXdk\u003d",
@@ -199,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
   */
             Toast.makeText(this, data.getStringExtra("nativeSdkForMerchantMessage")
                     + data.getStringExtra("response"), Toast.LENGTH_SHORT).show();
-        }else{
+        } else {
             Log.e(TAG, " payment failed");
         }
     }
